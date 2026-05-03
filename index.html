@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skin Care Leaderboard</title>
+    <style>
+        /* COLOR PALETTE: Navy #003261, Sky #2FB3DF, Orange #FF995D, Mint #B2DFDB */
+        :root {
+            --sky-blue: #2FB3DF;
+            --orange: #FF995D;
+            --navy: #003261;
+            --mint: #B2DFDB;
+            --white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #0e1a2b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: var(--white);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: linear-gradient(180deg, var(--navy) 0%, #001a33 100%);
+            padding: 30px;
+            border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            position: relative;
+        }
+
+        /* Refresh Button */
+        .refresh-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--white);
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: 0.3s;
+        }
+
+        .refresh-btn:hover {
+            background: var(--sky-blue);
+        }
+
+        .spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Podium Layout */
+        .podium-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 10px;
+            height: 300px;
+            margin-bottom: 30px;
+        }
+
+        .podium-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--white);
+            border: 4px solid var(--sky-blue);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: var(--navy);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .rank-1 .avatar {
+            width: 90px;
+            height: 90px;
+            border-color: var(--orange);
+            font-size: 1.5rem;
+        }
+
+        .team-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            height: 18px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .score-pill {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 3px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+        }
+
+        .block {
+            width: 100%;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: center;
+            padding-top: 15px;
+            font-size: 2rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .rank-1 .block {
+            height: 140px;
+            background: linear-gradient(to bottom, #4fc3f7, var(--sky-blue));
+            color: white;
+        }
+
+        .rank-2 .block {
+            height: 100px;
+            background: var(--mint);
+            color: var(--navy);
+        }
+
+        .rank-3 .block {
+            height: 70px;
+            background: #205681;
+        }
+
+        .rank-4 .block {
+            height: 50px;
+            background: #1a3a52;
+        }
+
+        /* Others List */
+        .others-list {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            padding: 5px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .rank-num {
+            color: var(--orange);
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        #loading-text {
+            font-style: italic;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <button class="refresh-btn" id="refreshBtn" onclick="initiateDataFetch()">
+            <svg id="refresh-svg" width="22" height="22" viewBox="0 0 24 24" fill="white">
+                <path
+                    d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
+            </svg>
+        </button>
+
+        <h2 style="margin-top:0; letter-spacing: 1px;">SKIN CARE LEADERBOARD</h2>
+
+        <div id="podium" class="podium-wrapper">
+            <div id="loading-text">Loading Leaderboard...</div>
+        </div>
+
+        <div id="others" class="others-list"></div>
+    </div>
+
+    <script>
+        const SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbyfDGCNRIIO2pPX-lnMkNngL0flyD8DJkCdQ87MA424g15faOgyU8jkU4U5m9TQMmu3Ng/exec';
+
+        // This is the function Google will call once the data is ready
+        function handleGoogleSheetResponse(response) {
+            document.getElementById('refresh-svg').classList.remove('spinning');
+
+            if (!response || !response.table) {
+                alert("Could not load data. Check sheet privacy settings.");
+                return;
+            }
+
+            const rows = response.table.rows;
+            let teams = rows.map(row => ({
+                name: row.c[0] ? String(row.c[0].v).trim() : 'Unknown',
+                score: row.c[7] ? row.c[7].v : 0 // Column H
+            }))
+                // Filter headers, empty names, and non-numeric scores
+                .filter(t => t.name && t.name.toLowerCase() !== 'team' && !isNaN(Number(t.score)))
+                .sort((a, b) => Number(b.score) - Number(a.score));
+
+            renderLeaderboard(teams);
+        }
+
+        // This creates a dynamic script tag to bypass CORS
+        function initiateDataFetch() {
+            document.getElementById('refresh-svg').classList.add('spinning');
+
+            // Remove old script if it exists
+            const oldScript = document.getElementById('google-data-script');
+            if (oldScript) oldScript.remove();
+
+            // Create new script request
+            const script = document.createElement('script');
+            script.id = 'google-data-script';
+            // The callback parameter 'handleGoogleSheetResponse' is key here
+            script.src = `${SHEET_API_URL}?callback=handleGoogleSheetResponse&t=${Date.now()}`;
+            document.body.appendChild(script);
+        }
+
+        function renderLeaderboard(teams) {
+            const podiumContainer = document.getElementById('podium');
+            const listContainer = document.getElementById('others');
+
+            const top4 = teams.slice(0, 4);
+            const others = teams.slice(4);
+
+            // UI Order: 2nd Place, 1st Place, 3rd Place, 4th Place
+            const uiOrder = [top4[1], top4[0], top4[2], top4[3]];
+            const config = [
+                { class: 'rank-2', num: 2 },
+                { class: 'rank-1', num: 1 },
+                { class: 'rank-3', num: 3 },
+                { class: 'rank-4', num: 4 }
+            ];
+
+            podiumContainer.innerHTML = '';
+            uiOrder.forEach((team, i) => {
+                if (!team) return;
+                const initials = team.name.substring(0, 2).toUpperCase();
+                podiumContainer.innerHTML += `
+                <div class="podium-column ${config[i].class}">
+                    <div class="avatar">${initials}</div>
+                    <div class="team-name">${team.name}</div>
+                    <div class="score-pill">${team.score.toLocaleString()}</div>
+                    <div class="block">${config[i].num}</div>
+                </div>`;
+            });
+
+            listContainer.innerHTML = '';
+            others.forEach((team, i) => {
+                listContainer.innerHTML += `
+                <div class="list-item">
+                    <span><span class="rank-num">#${i + 5}</span>${team.name}</span>
+                    <span style="font-weight:bold; color:var(--sky-blue)">${team.score.toLocaleString()}</span>
+                </div>`;
+            });
+        }
+
+        // Initial load when file opens
+        window.onload = initiateDataFetch;
+    </script>
+
+</body>
+
+</html>
